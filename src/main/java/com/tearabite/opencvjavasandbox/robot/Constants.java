@@ -9,21 +9,21 @@ import org.opencv.imgproc.Imgproc;
 
 public class Constants {
     // CV Color Constants
-    public static Scalar RED = new Scalar(255, 0, 0);
+    public static Scalar RED = new Scalar(0, 0, 255);
     public static Scalar GREEN = new Scalar(0, 255, 0);
     public static Scalar BLUE = new Scalar(0, 0, 255);
     public static Scalar WHITE = new Scalar(255, 255, 255);
     public static Scalar GRAY = new Scalar(80, 80, 80);
     public static Scalar BLACK = new Scalar(0, 0, 0);
     public static Scalar ORANGE = new Scalar(255, 165, 0);
-    public static Scalar YELLOW = new Scalar(255, 255, 0);
+    public static Scalar YELLOW = new Scalar(0, 255, 255);
     public static Scalar PURPLE = new Scalar(128, 0, 128);
 
     // CV Structuring Constants
     public static final Mat STRUCTURING_ELEMENT = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(10, 10));
     public static final Point ANCHOR = new Point((STRUCTURING_ELEMENT.cols() / 2f), STRUCTURING_ELEMENT.rows() / 2f);
     public static final int ERODE_DILATE_ITERATIONS = 2;
-    public static final Size BLUR_SIZE = new Size(7, 7);
+    public static final Size BLUR_SIZE = new Size(10, 10);
 
     // CV Camera Constants
     public static final int WEBCAM_WIDTH = 320;

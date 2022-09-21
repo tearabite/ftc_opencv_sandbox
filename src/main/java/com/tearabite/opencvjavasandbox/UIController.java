@@ -11,11 +11,11 @@ import com.tearabite.opencvjavasandbox.robot.JunctionPipeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.image.PixelReader;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -47,6 +47,7 @@ public class UIController {
     @FXML
     private ColorPicker yellowUpper;
 
+    private static final int MAX_PIXEL_WALK_HUE_DEVIATION = 10;
     private ScheduledExecutorService timer;
     private ScheduledFuture<?> timerFuture;
     private final VideoCapture capture = new VideoCapture();
@@ -222,15 +223,54 @@ public class UIController {
         int x = (int) (imageWidth * ratioX);
         int y = (int) (imageHeight * ratioY);
 
-        javafx.scene.paint.Color color = currentFrame.getImage().getPixelReader().getColor(x, y);
-        float[] hsv = java.awt.Color.RGBtoHSB((int)(color.getRed() * 255), (int)(color.getGreen() * 255), (int)(color.getBlue() * 255), null);
-        hsv[0] *= 360;
-        hsv[1] *= 255;
-        hsv[2] *= 255;
+        PixelReader pr = currentFrame.getImage().getPixelReader();
+        javafx.scene.paint.Color selectedColor = pr.getColor(x, y);
+        double lowerH = selectedColor.getHue();
+        double upperH = selectedColor.getHue();
+        double previH = selectedColor.getHue();
 
-        imageRoot.setStyle(String.format("-fx-background-color: %s", toRGBCode(color)));
-        YELLOW_UPPER = new Color(hsv[0] + 40 * 0.5, 1.0 * 255, 1.0 * 255);
-        YELLOW_LOWER = new Color(hsv[0] * 0.5, 0.4 * 255, 0.4 * 255);
-        System.out.printf("Upper: %s, Lower: %s\n", YELLOW_UPPER, YELLOW_LOWER);
+        // Walk Left
+        for (int i = x; i > 0; i--) {
+            javafx.scene.paint.Color c = pr.getColor(i, y);
+            if (Math.abs(c.getHue() - previH) > MAX_PIXEL_WALK_HUE_DEVIATION) {
+                break;
+            }
+
+            if (c.getHue() < lowerH) {
+                lowerH = c.getHue();
+            }
+
+            if (c.getHue() > upperH) {
+                upperH = c.getHue();
+            }
+
+            previH = c.getHue();
+        }
+
+        // Walk Right
+        for (int i = x; i < imageWidth; i++) {
+            javafx.scene.paint.Color c = pr.getColor(i, y);
+            if (Math.abs(c.getHue() - previH) > MAX_PIXEL_WALK_HUE_DEVIATION) {
+                break;
+            }
+
+            if (c.getHue() < lowerH) {
+                lowerH = c.getHue();
+            }
+
+            if (c.getHue() > upperH) {
+                upperH = c.getHue();
+            }
+
+            previH = c.getHue();
+        }
+
+        Color lower = new Color(lowerH, 0.3 * 255, 0.3 * 255);
+        Color upper = new Color(upperH, 1.0 * 255, 1.0 * 255);
+
+        imageRoot.setStyle(String.format("-fx-background-color: %s", toRGBCode(selectedColor)));
+
+        YELLOW_UPPER = upper;
+        YELLOW_LOWER = lower;
     }
 }

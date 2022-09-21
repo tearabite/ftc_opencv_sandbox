@@ -8,7 +8,7 @@ public class Color {
     }
 
     public double[] get() {
-        return new double[] { h, s, v};
+        return new double[]{h, s, v};
     }
 
     public double getH() {
@@ -23,9 +23,22 @@ public class Color {
         return this.v;
     }
 
-    public double h;
-    public double s;
-    public double v;
+    private final double h;
+    private final double s;
+    private final double v;
+
+    public static Color fromUIColor(javafx.scene.paint.Color color) {
+        float[] hsv = java.awt.Color.RGBtoHSB(
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                null);
+        hsv[0] *= 180;
+        hsv[1] *= 255;
+        hsv[2] *= 255;
+
+        return new Color(hsv[0], hsv[1], hsv[2]);
+    }
 
     @Override
     public String toString() {

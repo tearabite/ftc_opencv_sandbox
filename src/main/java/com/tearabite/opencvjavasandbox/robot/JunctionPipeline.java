@@ -19,7 +19,7 @@ public class JunctionPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.blur(input, blurred, new Size(10, 10));
+        Imgproc.blur(input, blurred, BLUR_SIZE);
         Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_BGR2HSV);
         Core.inRange(hsv , new Scalar(YELLOW_LOWER.get()), new Scalar(YELLOW_UPPER.get()), colorMask);
         Imgproc.erode(colorMask, colorMask, STRUCTURING_ELEMENT, ANCHOR, ERODE_DILATE_ITERATIONS);
@@ -31,8 +31,13 @@ public class JunctionPipeline extends OpenCvPipeline {
         for (int i = 0; i < colorContours.size(); i++) {
             Detection detection = new Detection(input.size(),0.005);
             detection.setContour(colorContours.get(i));
-            detection.draw(input, GREEN);
+//            detection.drawAngledRect(input, YELLOW, false);
             detections.add(detection);
+
+            if (detection.isValid()) {
+                Point p = detection.getTopCenterOfAngledRect();
+                OpenCVUtil.drawPoint(input, p, RED, 10);
+            }
         }
 
         return input;

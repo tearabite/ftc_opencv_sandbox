@@ -1,11 +1,11 @@
 package com.tearabite.opencvjavasandbox.robot;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.tearabite.opencvjavasandbox.robot.Constants.*;
 import static com.tearabite.opencvjavasandbox.robot.OpenCVUtil.*;
@@ -43,22 +43,20 @@ public class Detection {
     }
 
     // Draw a convex hull around the current detection on the given image
-    public void draw(Mat img, Scalar color) {
+    public void draw(Mat img, Scalar color, boolean fill) {
         if (isValid()) {
-            drawConvexHull(img, contour, color);
-            drawPoint(img, centerPx, GREEN);
-//            drawPoint(img, bottomLeftPx, GREEN);
-//            drawPoint(img, bottomRightPx, GREEN);
+            if (fill) {
+                fillConvexHull(img, contour, color);
+            } else {
+                drawConvexHull(img, contour, color);
+            }
+            drawPoint(img, centerPx, GREEN, 3);
         }
     }
 
-    // Draw a convex hull around the current detection on the given image
-    public void fill(Mat img, Scalar color) {
+    public void drawAngledRect(Mat img, Scalar color, boolean fill) {
         if (isValid()) {
-            fillConvexHull(img, contour, color);
-            drawPoint(img, centerPx, GREEN);
-//            drawPoint(img, bottomLeftPx, GREEN);
-//            drawPoint(img, bottomRightPx, GREEN);
+            OpenCVUtil.drawAngledRect(img, contour, color, fill);
         }
     }
 
@@ -125,5 +123,30 @@ public class Detection {
     // Get the rightmost bottom corner of the detection
     public Point getBottomRightCornerPx() {
         return bottomRightPx;
+    }
+
+    public Point getTopCenterOfAngledRect() {
+        RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
+        Point[] vertices = new Point[4];
+        rect.points(vertices);
+        Point highest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
+        Point secondHighest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
+        for (int i = 0; i < vertices.length; i++) {
+            if (vertices[i].y < highest.y) {
+                if (highest.y < secondHighest.y) {
+                    secondHighest = highest;
+                }
+                highest = vertices[i];
+            } else if (vertices[i].y < secondHighest.y) {
+                secondHighest = vertices[i];
+            }
+        }
+
+        double x1 = secondHighest.x;
+        double x2 = highest.x;
+        double y1 = secondHighest.y;
+        double y2 = highest.y;
+        Point m = new Point((x1 + x2) / 2, (y1 + y2) / 2);
+        return m;
     }
 }

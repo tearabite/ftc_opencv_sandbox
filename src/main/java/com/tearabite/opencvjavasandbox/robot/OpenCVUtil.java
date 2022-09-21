@@ -1,15 +1,11 @@
 package com.tearabite.opencvjavasandbox.robot;
 
 import com.tearabite.opencvjavasandbox.fakes.Alliance;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -22,8 +18,8 @@ public class OpenCVUtil {
     public static String telem = "nothing";
 
     // Draw a point
-    public static void drawPoint(Mat img, Point point, Scalar color) {
-        Imgproc.circle(img, point, 3, color,  -1);
+    public static void drawPoint(Mat img, Point point, Scalar color, int radiusPx) {
+        Imgproc.circle(img, point, radiusPx, color,  -1);
     }
 
     // Get the center of a contour
@@ -61,6 +57,16 @@ public class OpenCVUtil {
         MatOfInt hull =  new MatOfInt();
         Imgproc.convexHull(contour, hull);
         Imgproc.drawContours(img, Collections.singletonList(convertIndexesToPoints(contour, hull)), 0, color, -1);
+    }
+
+    public static void drawAngledRect(Mat img, MatOfPoint contour, Scalar color, boolean fill) {
+        RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
+        Point[] vertices = new Point[4];
+        rect.points(vertices);
+        List<MatOfPoint> boxContours = new ArrayList<>();
+        boxContours.add(new MatOfPoint(vertices));
+        Imgproc.drawContours(img, boxContours, 0, color, fill ? -1 : 2);
+
     }
 
     // Convert indexes to points that is used in order to draw the contours
