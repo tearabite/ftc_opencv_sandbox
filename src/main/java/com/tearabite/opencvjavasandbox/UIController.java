@@ -5,16 +5,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.tearabite.opencvjavasandbox.fakes.Alliance;
+import com.tearabite.opencvjavasandbox.fakes.Color;
 import com.tearabite.opencvjavasandbox.fakes.OpenCvPipeline;
-import com.tearabite.opencvjavasandbox.robot.TargetingPipeline;
+import com.tearabite.opencvjavasandbox.robot.JunctionPipeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -24,6 +25,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import static com.tearabite.opencvjavasandbox.robot.Constants.YELLOW_LOWER;
+import static com.tearabite.opencvjavasandbox.robot.Constants.YELLOW_UPPER;
+import static com.tearabite.opencvjavasandbox.robot.OpenCVUtil.toRGBCode;
 
 public class UIController {
     @FXML
@@ -37,6 +42,10 @@ public class UIController {
     private TextField maxFps;
     @FXML
     private ComboBox<Size> imageSize;
+    @FXML
+    private ColorPicker yellowLower;
+    @FXML
+    private ColorPicker yellowUpper;
 
     private ScheduledExecutorService timer;
     private ScheduledFuture<?> timerFuture;
@@ -47,7 +56,7 @@ public class UIController {
 
     // Change these as needed
     private static int cameraId = 0;
-    private final OpenCvPipeline pipeline = new TargetingPipeline(Alliance.RED);
+    private final OpenCvPipeline pipeline = new JunctionPipeline();
 
     public void initialize() {
         // Bind the width of the current frame to the size of its container.
@@ -55,9 +64,6 @@ public class UIController {
         imageRoot.setCenter(currentFrame);
 
         setFps(framerate);
-
-
-
     }
 
     /**
@@ -202,5 +208,29 @@ public class UIController {
                 maxFps.setText(Integer.toString(framerate));
             }
         }
+    }
+
+    public void viewportClicked(MouseEvent mouseEvent) {
+        double uiX = mouseEvent.getX();
+        double uiY = mouseEvent.getY();
+        double uiWidth = currentFrame.getBoundsInLocal().getWidth();
+        double uiHeight = currentFrame.getBoundsInLocal().getHeight();
+        double ratioX = uiX / uiWidth;
+        double ratioY = uiY / uiHeight;
+        double imageWidth = currentFrame.getImage().getWidth();
+        double imageHeight = currentFrame.getImage().getHeight();
+        int x = (int) (imageWidth * ratioX);
+        int y = (int) (imageHeight * ratioY);
+
+        javafx.scene.paint.Color color = currentFrame.getImage().getPixelReader().getColor(x, y);
+        float[] hsv = java.awt.Color.RGBtoHSB((int)(color.getRed() * 255), (int)(color.getGreen() * 255), (int)(color.getBlue() * 255), null);
+        hsv[0] *= 360;
+        hsv[1] *= 255;
+        hsv[2] *= 255;
+
+        imageRoot.setStyle(String.format("-fx-background-color: %s", toRGBCode(color)));
+        YELLOW_UPPER = new Color(hsv[0] + 40 * 0.5, 1.0 * 255, 1.0 * 255);
+        YELLOW_LOWER = new Color(hsv[0] * 0.5, 0.4 * 255, 0.4 * 255);
+        System.out.printf("Upper: %s, Lower: %s\n", YELLOW_UPPER, YELLOW_LOWER);
     }
 }

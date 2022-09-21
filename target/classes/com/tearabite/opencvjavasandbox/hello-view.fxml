@@ -11,11 +11,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Button?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tearabite.opencvjavasandbox.UIController">
+<AnchorPane prefHeight="600.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tearabite.opencvjavasandbox.UIController">
    <children>
       <BorderPane fx:id="imageRoot" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="300.0" AnchorPane.topAnchor="0.0">
          <center>
-            <ImageView fx:id="currentFrame" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+            <ImageView fx:id="currentFrame" onMouseClicked="#viewportClicked" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
          </center>
       </BorderPane>
       <BorderPane layoutX="200.0" maxWidth="300.0" minWidth="300.0" prefHeight="200.0" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

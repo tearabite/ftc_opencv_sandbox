@@ -26,4 +26,9 @@ public class Color {
     public double h;
     public double s;
     public double v;
+
+    @Override
+    public String toString() {
+        return String.format("%f, %f, %f", this.h, this.s, this.v);
+    }
 }
