@@ -125,6 +125,33 @@ public class Detection {
         return bottomRightPx;
     }
 
+    public double getWidthOfAngledRect() {
+        RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
+        Point[] vertices = new Point[4];
+        rect.points(vertices);
+        Point highest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
+        Point secondHighest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
+        for (int i = 0; i < vertices.length; i++) {
+            if (vertices[i].y < highest.y) {
+                if (highest.y < secondHighest.y) {
+                    secondHighest = highest;
+                }
+                highest = vertices[i];
+            } else if (vertices[i].y < secondHighest.y) {
+                secondHighest = vertices[i];
+            }
+        }
+
+        double x1 = secondHighest.x;
+        double x2 = highest.x;
+        double y1 = secondHighest.y;
+        double y2 = highest.y;
+
+        double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+
+        return distance;
+    }
+
     public Point getTopCenterOfAngledRect() {
         RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
         Point[] vertices = new Point[4];

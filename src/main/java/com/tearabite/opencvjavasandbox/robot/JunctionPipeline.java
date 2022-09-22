@@ -28,6 +28,8 @@ public class JunctionPipeline extends OpenCvPipeline {
         detections.clear();
         ArrayList<MatOfPoint> colorContours = new ArrayList<>();
         Imgproc.findContours(colorMask, colorContours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        Detection closestDetection = null;
+        double closestWidth = 0;
         for (int i = 0; i < colorContours.size(); i++) {
             Detection detection = new Detection(input.size(),0.005);
             detection.setContour(colorContours.get(i));
@@ -37,8 +39,21 @@ public class JunctionPipeline extends OpenCvPipeline {
             if (detection.isValid()) {
                 Point p = detection.getTopCenterOfAngledRect();
                 OpenCVUtil.drawPoint(input, p, RED, 10);
+
+                double width = detection.getWidthOfAngledRect();
+                if (width > closestWidth) {
+                    closestDetection = detection;
+                    closestWidth = width;
+                }
             }
         }
+
+        if (closestDetection != null) {
+            OpenCVUtil.drawPoint(input, closestDetection.getTopCenterOfAngledRect(), GREEN, 10);
+        }
+
+
+
 
         return input;
     }
