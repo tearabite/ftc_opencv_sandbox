@@ -3,10 +3,6 @@ package com.tearabite.opencvjavasandbox.robot;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static com.tearabite.opencvjavasandbox.robot.Constants.*;
 import static com.tearabite.opencvjavasandbox.robot.OpenCVUtil.*;
 
@@ -42,7 +38,6 @@ public class Detection {
         this.minAreaPx = maxSizePx.area() * maxAreaFactor;
     }
 
-    // Draw a convex hull around the current detection on the given image
     public void draw(Mat img, Scalar color, boolean fill) {
         if (isValid()) {
             if (fill) {
@@ -60,18 +55,15 @@ public class Detection {
         }
     }
 
-    // Check if the current Detection is valid
     public boolean isValid() {
 //        return true;
         return (this.contour != null) && (this.centerPx != INVALID_POINT) && (this.areaPx != INVALID_AREA);
     }
 
-    // Get the current contour
     public MatOfPoint getContour() {
         return contour;
     }
 
-    // Set the values of the current contour
     public void setContour(MatOfPoint contour) {
         this.contour = contour;
 
@@ -89,7 +81,6 @@ public class Detection {
         }
     }
 
-    // Returns the center of the Detection, normalized so that the width and height of the frame is from [-50,50]
     public Point getCenter() {
         if (!isValid()) {
             return INVALID_POINT;
@@ -101,12 +92,10 @@ public class Detection {
         return new Point(normalizedX, normalizedY);
     }
 
-    // Get the center point in pixels
     public Point getCenterPx() {
         return centerPx;
     }
 
-    // Get the area of the Detection, normalized so that the area of the frame is 100
     public double getArea() {
         if (!isValid()) {
             return INVALID_AREA;
@@ -115,12 +104,10 @@ public class Detection {
         return (areaPx / (maxSizePx.width * maxSizePx.height)) * 100;
     }
 
-    // Get the leftmost bottom corner of the detection
     public Point getBottomLeftCornerPx() {
         return bottomLeftPx;
     }
 
-    // Get the rightmost bottom corner of the detection
     public Point getBottomRightCornerPx() {
         return bottomRightPx;
     }
@@ -147,9 +134,7 @@ public class Detection {
         double y1 = secondHighest.y;
         double y2 = highest.y;
 
-        double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
-
-        return distance;
+        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
     }
 
     public Point getTopCenterOfAngledRect() {
@@ -173,7 +158,6 @@ public class Detection {
         double x2 = highest.x;
         double y1 = secondHighest.y;
         double y2 = highest.y;
-        Point m = new Point((x1 + x2) / 2, (y1 + y2) / 2);
-        return m;
+        return new Point((x1 + x2) / 2, (y1 + y2) / 2);
     }
 }

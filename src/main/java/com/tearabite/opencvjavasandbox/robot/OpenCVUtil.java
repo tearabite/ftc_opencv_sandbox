@@ -1,6 +1,5 @@
 package com.tearabite.opencvjavasandbox.robot;
 
-import com.tearabite.opencvjavasandbox.fakes.Alliance;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -8,9 +7,6 @@ import org.opencv.imgproc.Moments;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-
-import static com.tearabite.opencvjavasandbox.robot.Constants.*;
 
 // CV Helper Functions
 public class OpenCVUtil {

@@ -270,6 +270,7 @@ public class UIController {
 
         imageRoot.setStyle(String.format("-fx-background-color: %s", toRGBCode(selectedColor)));
 
+        // TODO: These are sort of pipeline specific. We should abstract this more.
         YELLOW_UPPER = upper;
         YELLOW_LOWER = lower;
     }

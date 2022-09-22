@@ -33,7 +33,6 @@ public class JunctionPipeline extends OpenCvPipeline {
         for (int i = 0; i < colorContours.size(); i++) {
             Detection detection = new Detection(input.size(),0.005);
             detection.setContour(colorContours.get(i));
-//            detection.drawAngledRect(input, YELLOW, false);
             detections.add(detection);
 
             if (detection.isValid()) {
@@ -51,9 +50,6 @@ public class JunctionPipeline extends OpenCvPipeline {
         if (closestDetection != null) {
             OpenCVUtil.drawPoint(input, closestDetection.getTopCenterOfAngledRect(), GREEN, 10);
         }
-
-
-
 
         return input;
     }
