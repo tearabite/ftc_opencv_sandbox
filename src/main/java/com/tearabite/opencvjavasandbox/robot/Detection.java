@@ -3,6 +3,10 @@ package com.tearabite.opencvjavasandbox.robot;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 import static com.tearabite.opencvjavasandbox.robot.Constants.*;
 import static com.tearabite.opencvjavasandbox.robot.OpenCVUtil.*;
 
@@ -11,7 +15,7 @@ public class Detection {
     private double minAreaPx;
     private double maxAreaPx;
     private final Size maxSizePx;
-    private double areaPx =  INVALID_AREA;
+    private double areaPx = INVALID_AREA;
     private Point centerPx = INVALID_POINT;
     private Point bottomLeftPx = INVALID_POINT;
     private Point bottomRightPx = INVALID_POINT;
@@ -112,52 +116,32 @@ public class Detection {
         return bottomRightPx;
     }
 
-    public double getWidthOfAngledRect() {
+    private List<Point> getSsortedAngledRectVertices() {
         RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
         Point[] vertices = new Point[4];
         rect.points(vertices);
-        Point highest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
-        Point secondHighest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
-        for (int i = 0; i < vertices.length; i++) {
-            if (vertices[i].y < highest.y) {
-                if (highest.y < secondHighest.y) {
-                    secondHighest = highest;
-                }
-                highest = vertices[i];
-            } else if (vertices[i].y < secondHighest.y) {
-                secondHighest = vertices[i];
-            }
-        }
+        return Arrays.stream(vertices).sorted(Comparator.comparingDouble(o -> o.y)).toList();
+    }
 
-        double x1 = secondHighest.x;
-        double x2 = highest.x;
-        double y1 = secondHighest.y;
-        double y2 = highest.y;
+    public double getWidthOfAngledRect() {
+        List<Point> angledRectVerticies = getSsortedAngledRectVertices();
+
+        double x1 = angledRectVerticies.get(1).x;
+        double x2 = angledRectVerticies.get(0).x;
+        double y1 = angledRectVerticies.get(1).y;
+        double y2 = angledRectVerticies.get(0).y;
 
         return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
     }
 
     public Point getTopCenterOfAngledRect() {
-        RotatedRect rect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
-        Point[] vertices = new Point[4];
-        rect.points(vertices);
-        Point highest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
-        Point secondHighest = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
-        for (int i = 0; i < vertices.length; i++) {
-            if (vertices[i].y < highest.y) {
-                if (highest.y < secondHighest.y) {
-                    secondHighest = highest;
-                }
-                highest = vertices[i];
-            } else if (vertices[i].y < secondHighest.y) {
-                secondHighest = vertices[i];
-            }
-        }
+        List<Point> angledRectVerticies = getSsortedAngledRectVertices();
 
-        double x1 = secondHighest.x;
-        double x2 = highest.x;
-        double y1 = secondHighest.y;
-        double y2 = highest.y;
+        double x1 = angledRectVerticies.get(1).x;
+        double x2 = angledRectVerticies.get(0).x;
+        double y1 = angledRectVerticies.get(1).y;
+        double y2 = angledRectVerticies.get(0).y;
+
         return new Point((x1 + x2) / 2, (y1 + y2) / 2);
     }
 }

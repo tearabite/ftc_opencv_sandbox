@@ -35,6 +35,7 @@ public class JunctionPipeline extends OpenCvPipeline {
             detection.setContour(colorContours.get(i));
             detections.add(detection);
 
+            detection.drawAngledRect(input, YELLOW, true);
             if (detection.isValid()) {
                 Point p = detection.getTopCenterOfAngledRect();
                 OpenCVUtil.drawPoint(input, p, RED, 10);
