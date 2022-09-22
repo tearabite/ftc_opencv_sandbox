@@ -1,6 +1,7 @@
 package com.tearabite.opencvjavasandbox;
 
 import javafx.scene.layout.AnchorPane;
+import nu.pattern.OpenCV;
 import org.opencv.core.Core;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +34,7 @@ public class OpenCVJavaSandbox extends Application {
 
     public static void main(String[] args)
     {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        OpenCV.loadLocally();
         launch(args);
     }
 }
