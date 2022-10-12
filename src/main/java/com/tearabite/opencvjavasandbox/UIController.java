@@ -8,12 +8,10 @@ import java.util.concurrent.TimeUnit;
 import com.tearabite.opencvjavasandbox.fakes.Color;
 import com.tearabite.opencvjavasandbox.fakes.OpenCvPipeline;
 import com.tearabite.opencvjavasandbox.robot.JunctionPipeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.PixelReader;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import org.opencv.core.Mat;
@@ -39,13 +37,7 @@ public class UIController {
     private ImageView currentFrame;
 
     @FXML
-    private TextField maxFps;
-    @FXML
-    private ComboBox<Size> imageSize;
-    @FXML
-    private ColorPicker yellowLower;
-    @FXML
-    private ColorPicker yellowUpper;
+    private TableView<SettingsRow> settings;
 
     private static final int MAX_PIXEL_WALK_HUE_DEVIATION = 10;
     private ScheduledExecutorService timer;
@@ -53,18 +45,35 @@ public class UIController {
     private final VideoCapture capture = new VideoCapture();
     private boolean cameraActive = false;
     private Runnable frameGrabber;
-    private int framerate = 30;
 
     // Change these as needed
     private static int cameraId = 0;
     private final OpenCvPipeline pipeline = new JunctionPipeline();
 
-    public void initialize() {
+    public void initialize() throws IllegalAccessException {
         // Bind the width of the current frame to the size of its container.
+
         currentFrame.fitWidthProperty().bind(imageRoot.widthProperty());
         imageRoot.setCenter(currentFrame);
 
-        setFps(framerate);
+
+        TableColumn<SettingsRow, String> keyColumn = (TableColumn<SettingsRow, String>) settings.getColumns().get(0);
+        TableColumn<SettingsRow, String> valueColumn = (TableColumn<SettingsRow, String>) settings.getColumns().get(1);
+
+        keyColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
+        valueColumn.setCellValueFactory(new PropertyValueFactory<>("valueAsString"));
+        valueColumn.setOnEditCommit(e -> {
+            try {
+                e.getRowValue().setValueFromString(e.getNewValue());
+            } catch (Exception ex) {
+                // Swallow the exception
+            } finally {
+                e.getTableView().refresh();
+            }
+        });
+        valueColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        settings.setItems(Settings.getObservableList());
+        settings.setEditable(true);
     }
 
     /**
@@ -88,25 +97,23 @@ public class UIController {
                     public void run() {
                         Mat frame = grabFrame();
                         if (isFirstFrame) {
-                            initImageSizeOptions(frame);
                             pipeline.init(frame);
                             isFirstFrame = false;
+
+                            Settings.imageSize = new Size(frame.width(), frame.height());
+                            settings.refresh();
                         }
 
                         Image imageToShow;
-                        if (imageSize.getValue() != null) {
-                            Mat resized = new Mat();
-                            Imgproc.resize(frame, resized, imageSize.getValue(), Imgproc.INTER_AREA);
-                            imageToShow = Utils.mat2Image(resized);
-                        } else {
-                            imageToShow = Utils.mat2Image(frame);
-                        }
+                        Mat resized = new Mat();
+                        Imgproc.resize(frame, resized, Settings.imageSize, Imgproc.INTER_AREA);
+                        imageToShow = Utils.mat2Image(resized);
                         updateImageView(currentFrame, imageToShow);
                     }
                 };
 
                 this.timer = Executors.newSingleThreadScheduledExecutor();
-                this.timerFuture = this.timer.scheduleAtFixedRate(frameGrabber, 0, 1000 / this.framerate, TimeUnit.MILLISECONDS);
+                this.timerFuture = this.timer.scheduleAtFixedRate(frameGrabber, 0, 1000 / Settings.FPS, TimeUnit.MILLISECONDS);
 
                 this.startButton.setText("Stop Camera");
             } else {
@@ -119,19 +126,19 @@ public class UIController {
         }
     }
 
-    private void initImageSizeOptions(Mat frame) {
-        int width = frame.width();
-        int height = frame.height();
-        ObservableList<Size> options =
-                FXCollections.observableArrayList(
-                        new Size(width, height),
-                        new Size(width / 2, height / 2),
-                        new Size(width / 4, height / 4),
-                        new Size(width / 8, height / 8)
-                );
-        Utils.onFXThread(imageSize.itemsProperty(), options);
-        Utils.onFXThread(imageSize.valueProperty(), options.get(0));
-    }
+//    private void initImageSizeOptions(Mat frame) {
+//        int width = frame.width();
+//        int height = frame.height();
+//        ObservableList<Size> options =
+//                FXCollections.observableArrayList(
+//                        new Size(width, height),
+//                        new Size(width / 2, height / 2),
+//                        new Size(width / 4, height / 4),
+//                        new Size(width / 8, height / 8)
+//                );
+//        Utils.onFXThread(imageSize.itemsProperty(), options);
+//        Utils.onFXThread(imageSize.valueProperty(), options.get(0));
+//    }
 
     private Mat grabFrame() {
         Mat frame = new Mat();
@@ -158,7 +165,7 @@ public class UIController {
         if (this.timer != null && !this.timer.isShutdown()) {
             try {
                 this.timer.shutdown();
-                this.timer.awaitTermination(1000 / this.framerate, TimeUnit.MILLISECONDS);
+                this.timer.awaitTermination(1000 / Settings.FPS, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 System.err.println("Exception in stopping the frame capture, trying to release the camera now... " + e);
             }
@@ -187,29 +194,29 @@ public class UIController {
         this.stopAcquisition();
     }
 
-    public void setFps(int fps) {
-        if (fps <= 0) {
-            throw new NumberFormatException("Framerate cannot be zero or negative");
-        }
+//    public void setFps(int fps) {
+//        if (fps <= 0) {
+//            throw new NumberFormatException("Framerate cannot be zero or negative");
+//        }
+//
+//        if (timerFuture != null) {
+//            timerFuture.cancel(false);
+//        }
+//        if (this.cameraActive) {
+//            this.timerFuture = this.timer.scheduleAtFixedRate(frameGrabber, 0, 1000 / fps, TimeUnit.MILLISECONDS);
+//        }
+//        this.maxFps.setText(Integer.toString(fps));
+//    }
 
-        if (timerFuture != null) {
-            timerFuture.cancel(false);
-        }
-        if (this.cameraActive) {
-            this.timerFuture = this.timer.scheduleAtFixedRate(frameGrabber, 0, 1000 / fps, TimeUnit.MILLISECONDS);
-        }
-        this.maxFps.setText(Integer.toString(fps));
-    }
-
-    public void maxFpsKeyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ENTER) {
-            try {
-                setFps(Integer.parseInt(maxFps.getText()));
-            } catch (NumberFormatException e) {
-                maxFps.setText(Integer.toString(framerate));
-            }
-        }
-    }
+//    public void maxFpsKeyPressed(KeyEvent keyEvent) {
+//        if (keyEvent.getCode() == KeyCode.ENTER) {
+//            try {
+//                setFps(Integer.parseInt(maxFps.getText()));
+//            } catch (NumberFormatException e) {
+//                maxFps.setText(Integer.toString(framerate));
+//            }
+//        }
+//    }
 
     public void viewportClicked(MouseEvent mouseEvent) {
         double uiX = mouseEvent.getX();

@@ -5,6 +5,7 @@ module com.tearabite.opencvjavasandbox {
     requires org.controlsfx.controls;
     requires opencv;
     requires java.desktop;
+    requires static lombok;
 
     opens com.tearabite.opencvjavasandbox to javafx.fxml;
     exports com.tearabite.opencvjavasandbox;
@@ -12,4 +13,5 @@ module com.tearabite.opencvjavasandbox {
     opens com.tearabite.opencvjavasandbox.robot to javafx.fxml;
     exports com.tearabite.opencvjavasandbox.fakes;
     opens com.tearabite.opencvjavasandbox.fakes to javafx.fxml;
+
 }
