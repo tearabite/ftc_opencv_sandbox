@@ -16,7 +16,7 @@ public class OpenCVJavaSandbox extends Application {
         {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("hello-view.fxml"));
             AnchorPane rootElement = loader.load();
-            Scene scene = new Scene(rootElement, 1100, 450);
+            Scene scene = new Scene(rootElement, 640, 480);
             primaryStage.setTitle("JavaFX meets OpenCV");
             primaryStage.setScene(scene);
             rootElement.prefHeightProperty().bind(primaryStage.getScene().heightProperty());
