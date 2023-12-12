@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tearabite.opencvjavasandbox.robot.Constants.*;
-import static com.tearabite.opencvjavasandbox.robot.Constants.ERODE_DILATE_ITERATIONS;
 
 public class JunctionPipeline implements VisionProcessor {
     Mat blurred = new Mat();

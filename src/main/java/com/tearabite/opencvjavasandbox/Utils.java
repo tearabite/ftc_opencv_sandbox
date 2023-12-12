@@ -1,14 +1,13 @@
 package com.tearabite.opencvjavasandbox;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-
-import org.opencv.core.Mat;
-
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import org.opencv.core.Mat;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 
 public final class Utils {
 

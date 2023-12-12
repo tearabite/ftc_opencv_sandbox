@@ -1,12 +1,11 @@
 package com.tearabite.opencvjavasandbox;
 
-import javafx.scene.layout.AnchorPane;
-import nu.pattern.OpenCV;
-import org.opencv.core.Core;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import nu.pattern.OpenCV;
 
 public class OpenCVJavaSandbox extends Application {
 

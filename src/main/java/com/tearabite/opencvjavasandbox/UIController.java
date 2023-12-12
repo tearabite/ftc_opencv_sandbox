@@ -1,16 +1,17 @@
 package com.tearabite.opencvjavasandbox;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import com.tearabite.opencvjavasandbox.fakes.Color;
 import com.tearabite.opencvjavasandbox.fakes.VisionProcessor;
 import com.tearabite.opencvjavasandbox.robot.JunctionPipeline;
-import javafx.scene.control.*;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -19,10 +20,10 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static com.tearabite.opencvjavasandbox.robot.Constants.YELLOW_LOWER;
 import static com.tearabite.opencvjavasandbox.robot.Constants.YELLOW_UPPER;

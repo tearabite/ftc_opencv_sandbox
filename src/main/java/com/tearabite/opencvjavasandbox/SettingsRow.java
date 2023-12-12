@@ -1,6 +1,6 @@
 package com.tearabite.opencvjavasandbox;
 
-import lombok.*;
+import lombok.Getter;
 import org.opencv.core.Size;
 
 import java.lang.reflect.Field;
