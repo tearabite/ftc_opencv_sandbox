@@ -1,6 +1,8 @@
 package com.tearabite.opencvjavasandbox.robot;
 
-import com.tearabite.opencvjavasandbox.fakes.OpenCvPipeline;
+import com.tearabite.opencvjavasandbox.fakes.CameraCalibration;
+import com.tearabite.opencvjavasandbox.fakes.VisionProcessor;
+import javafx.scene.canvas.Canvas;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
@@ -10,7 +12,7 @@ import java.util.List;
 import static com.tearabite.opencvjavasandbox.robot.Constants.*;
 import static com.tearabite.opencvjavasandbox.robot.Constants.ERODE_DILATE_ITERATIONS;
 
-public class JunctionPipeline extends OpenCvPipeline {
+public class JunctionPipeline implements VisionProcessor {
     Mat blurred = new Mat();
     Mat hsv = new Mat();
     Mat colorMask = new Mat();
@@ -18,7 +20,12 @@ public class JunctionPipeline extends OpenCvPipeline {
     List<Detection> detections = new ArrayList<>();
 
     @Override
-    public Mat processFrame(Mat input) {
+    public void init(int width, int height, CameraCalibration calibration) {
+
+    }
+
+    @Override
+    public Mat processFrame(Mat input, long captureTimeNanos) {
         Imgproc.blur(input, blurred, BLUR_SIZE);
         Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_BGR2HSV);
         Core.inRange(hsv , new Scalar(YELLOW_LOWER.get()), new Scalar(YELLOW_UPPER.get()), colorMask);
@@ -53,5 +60,10 @@ public class JunctionPipeline extends OpenCvPipeline {
         }
 
         return input;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
     }
 }

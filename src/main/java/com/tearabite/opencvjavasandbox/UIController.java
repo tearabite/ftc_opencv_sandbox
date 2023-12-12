@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.tearabite.opencvjavasandbox.fakes.Color;
-import com.tearabite.opencvjavasandbox.fakes.OpenCvPipeline;
+import com.tearabite.opencvjavasandbox.fakes.VisionProcessor;
 import com.tearabite.opencvjavasandbox.robot.JunctionPipeline;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -48,7 +48,7 @@ public class UIController {
 
     // Change these as needed
     private static int cameraId = 0;
-    private final OpenCvPipeline pipeline = new JunctionPipeline();
+    private final VisionProcessor pipeline = new JunctionPipeline();
 
     public void initialize() throws IllegalAccessException {
         // Bind the width of the current frame to the size of its container.
@@ -97,7 +97,7 @@ public class UIController {
                     public void run() {
                         Mat frame = grabFrame();
                         if (isFirstFrame) {
-                            pipeline.init(frame);
+                            pipeline.init(frame.cols(), frame.rows(), null);
                             isFirstFrame = false;
 
                             Settings.imageSize = new Size(frame.width(), frame.height());
@@ -126,20 +126,6 @@ public class UIController {
         }
     }
 
-//    private void initImageSizeOptions(Mat frame) {
-//        int width = frame.width();
-//        int height = frame.height();
-//        ObservableList<Size> options =
-//                FXCollections.observableArrayList(
-//                        new Size(width, height),
-//                        new Size(width / 2, height / 2),
-//                        new Size(width / 4, height / 4),
-//                        new Size(width / 8, height / 8)
-//                );
-//        Utils.onFXThread(imageSize.itemsProperty(), options);
-//        Utils.onFXThread(imageSize.valueProperty(), options.get(0));
-//    }
-
     private Mat grabFrame() {
         Mat frame = new Mat();
 
@@ -148,7 +134,7 @@ public class UIController {
                 this.capture.read(frame);
 
                 if (!frame.empty()) {
-                    frame = pipeline.processFrame(frame);
+                    pipeline.processFrame(frame, 0);
                 }
             } catch (Exception e) {
                 System.err.println("Exception during the image elaboration: " + e);
@@ -193,30 +179,6 @@ public class UIController {
     protected void setClosed() {
         this.stopAcquisition();
     }
-
-//    public void setFps(int fps) {
-//        if (fps <= 0) {
-//            throw new NumberFormatException("Framerate cannot be zero or negative");
-//        }
-//
-//        if (timerFuture != null) {
-//            timerFuture.cancel(false);
-//        }
-//        if (this.cameraActive) {
-//            this.timerFuture = this.timer.scheduleAtFixedRate(frameGrabber, 0, 1000 / fps, TimeUnit.MILLISECONDS);
-//        }
-//        this.maxFps.setText(Integer.toString(fps));
-//    }
-
-//    public void maxFpsKeyPressed(KeyEvent keyEvent) {
-//        if (keyEvent.getCode() == KeyCode.ENTER) {
-//            try {
-//                setFps(Integer.parseInt(maxFps.getText()));
-//            } catch (NumberFormatException e) {
-//                maxFps.setText(Integer.toString(framerate));
-//            }
-//        }
-//    }
 
     public void viewportClicked(MouseEvent mouseEvent) {
         double uiX = mouseEvent.getX();
